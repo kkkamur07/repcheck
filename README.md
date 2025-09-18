@@ -30,7 +30,7 @@ I have identified that the most important goals of the CLI tool will be:
 - to check the **associativity of the code**  
 - **ease of reproducibility** of the code  
 
-But the bottleneck currently facing is about the executing and identification of code snippets to run to check reproducibility.  
+But the bottleneck currently facing is about the executing and identification of code snippets to run to check reproducibility $\to$ this is also a question of how reproducible the script is. 
 
 ***
 
@@ -45,3 +45,8 @@ flowchart LR
 ```
 
 ----
+
+## Updates : 
+1. Linting 
+2. Error summarization
+3. Dependency Resolution.
