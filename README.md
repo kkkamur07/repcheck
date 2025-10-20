@@ -13,7 +13,7 @@ We are using **Ollama** with IBM's instruction-following model `granite3.3:2b` f
 ## Flow Diagram
 
 ```mermaid
-flowchart TB
+flowchart LR
     A[Find Scripts] --> B[Dependency Resolution]
     B --> C[Topological Sort]
     C --> D[Lint Check]
@@ -28,7 +28,10 @@ flowchart TB
 
 ## Current State
 
-In the `test_scripts` directory we have some scripts with different folders to emulate different scripts, some of them bound to fail and some not.
+In the `test_scripts` directory we have some scripts with different folders to emulate different scripts, some of them bound to fail and some not with the support for different languages. 
+
+>[!IMPORTANT]
+> We need to test it *extensively* on different code bases for following the basic guidelines from different research publications like > **ACL**. 
 
 To make sure this runs:
 
@@ -47,29 +50,18 @@ repcheck order --dir ~/scripts --lang python
 ```
 
 > The `--dir` command line argument is used to specify the directory of the scripts.
+> The `--lang` command line argument is used to specify the programming language of the scripts.
 
 ## CLI Usage
+
 ```bash
-# Check R scripts in current directory
-./repcheck_cli.py check
-
-# Check R scripts in specific directory
-./repcheck_cli.py check --dir test_scripts/r/test1
-
-# Check Python scripts
-./repcheck_cli.py check --dir test_scripts/python/test1 --lang python
-
-# Show execution order without running
-./repcheck_cli.py order --dir test_scripts/python/test1 --lang python
-
-# Skip AI analysis (faster)
-./repcheck_cli.py check --dir my-project --no-llm
-
-# Custom file patterns
-./repcheck_cli.py check --dir . --pattern "scripts/**/*.R" --lang r
-
-# Exclude files
-./repcheck_cli.py check --dir . --exclude "test_*.py" --lang python
+./repcheck_cli.py check # Check R scripts in current directory
+./repcheck_cli.py check --dir test_scripts/r/test1 # Check R scripts in specific directory
+./repcheck_cli.py check --dir test_scripts/python/test1 --lang python # Check Python scripts
+./repcheck_cli.py order --dir test_scripts/python/test1 --lang python # Show execution order without running
+./repcheck_cli.py check --dir my-project --no-llm # Skip AI analysis (faster)
+./repcheck_cli.py check --dir . --pattern "scripts/**/*.R" --lang r # Custom file patterns
+./repcheck_cli.py check --dir . --exclude "test_*.py" --lang python # Exclude files
 ```
 
 ---
