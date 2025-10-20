@@ -1,16 +1,14 @@
 import os
-import json
 import shlex
 import subprocess
 from pathlib import Path
 from time import perf_counter
 from typing import List, Dict, Any
 
-class RScriptChecker:
-    """Simple R script checker with proper linting."""
-    
-    def __init__(self, timeout: int = 60):
-        self.timeout = timeout
+from repcheck.core.base_checker import BaseScriptChecker
+
+class RScriptChecker(BaseScriptChecker):
+    """R script checker with linting and execution."""
     
     def find_scripts(self, root: Path, patterns: List[str], exclude: List[str]) -> List[Path]:
         """Find R scripts matching patterns."""
@@ -27,7 +25,6 @@ class RScriptChecker:
     
     def lint_script(self, path: Path) -> Dict[str, Any]:
         """Lint R script using lintr package."""
-        # Simple R command to run lintr
         r_cmd = f'''
         if (requireNamespace("lintr", quietly = TRUE)) {{
             results <- lintr::lint("{path}")
@@ -62,7 +59,6 @@ class RScriptChecker:
     
     def run_script(self, path: Path) -> Dict[str, Any]:
         """Execute R script and return results."""
-        # Change to script's directory so relative paths work
         script_dir = path.parent
         script_name = path.name
         
@@ -75,7 +71,7 @@ class RScriptChecker:
                 capture_output=True, 
                 text=True, 
                 timeout=self.timeout,
-                cwd=script_dir  # Run from script's directory
+                cwd=script_dir
             )
             dur = perf_counter() - t0
             return {
@@ -95,47 +91,3 @@ class RScriptChecker:
                 "stderr": f"Timed out after {self.timeout}s",
                 "execution_passed": False
             }
-    
-    def check_script(self, path: Path, lint: bool = True) -> Dict[str, Any]:
-        """Check a single R script."""
-        result = {"path": str(path)}
-        
-        if lint:
-            lint_result = self.lint_script(path)
-            result.update(lint_result)
-        
-        exec_result = self.run_script(path)
-        result.update(exec_result)
-        
-        # Overall pass = lint passed AND execution passed
-        if lint:
-            result["overall_passed"] = result.get("lint_passed", False) and result["execution_passed"]
-        else:
-            result["overall_passed"] = result["execution_passed"]
-        
-        return result
-    
-    def check_all(self, root: Path, patterns: List[str], exclude: List[str], 
-                  lint: bool = True) -> Dict[str, Any]:
-        """Check all R scripts in project."""
-        scripts = self.find_scripts(root, patterns, exclude)
-        
-        if not scripts:
-            return {"scripts_found": 0, "results": []}
-        
-        results = []
-        for script in scripts:
-            result = self.check_script(script, lint)
-            results.append(result)
-        
-        # Summary
-        total = len(results)
-        passed = sum(1 for r in results if r["overall_passed"])
-        
-        return {
-            "root": str(root),
-            "scripts_found": total,
-            "results": results,
-            "passed": passed,
-            "failed": total - passed
-        }

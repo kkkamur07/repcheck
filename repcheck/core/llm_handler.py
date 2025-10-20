@@ -1,9 +1,8 @@
 import requests
-import json
 from typing import Optional
 
 class OllamaHandler:
-    """Simple OLLAMA handler for R error analysis."""
+    """Simple OLLAMA handler for error analysis."""
     
     def __init__(self, model: str = "granite3.3:2b", base_url: str = "http://localhost:11434"):
         self.model = model
@@ -29,8 +28,8 @@ class OllamaHandler:
                     "model": self.model,
                     "prompt": prompt,
                     "stream": False,
-                    "options" : {
-                        "temperature" : 0.8
+                    "options": {
+                        "temperature": 0.8
                     }
                 },
                 timeout=30
@@ -43,14 +42,13 @@ class OllamaHandler:
         except:
             return None
     
-    def analyze_error(self, script_path: str, error: str) -> Optional[str]:
-        """Analyze R script error."""
-        prompt = f"""
-        You are an R programming expert. Your job is to analyze the following R script and its error message, and provide a concise explanation of the likely cause of the error and how to fix it.
+    def analyze_error(self, script_path: str, error: str, language: str = "R") -> Optional[str]:
+        """Analyze script error for any programming language."""
+        prompt = f"""You are a {language} programming expert. Analyze this error and explain the likely cause and how to fix it.
 
-        Script: {script_path}
-        Error: {error}
+Script: {script_path}
+Error: {error}
 
-        Keep response under 100 words."""
+Keep response under 100 words."""
         
         return self.ask(prompt)
